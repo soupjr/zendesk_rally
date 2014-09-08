@@ -1,0 +1,12 @@
+<div class="start">
+	<div class="search_form_container">
+		<form class="form-horizontal">
+			<h5>{{t "label_search_term"}}</h5>
+			<input type="text" name="searchTerm" size="30"/>
+			<button class="btn btn_search_rally_alm">{{t "btn_search"}}</button>
+		</form>
+	</div>
+	<div>
+		<button class="btn btn_new_defect">{{t "btn_new_defect"}}</button>
+	</div>
+</div>

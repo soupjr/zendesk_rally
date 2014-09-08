@@ -1,0 +1,29 @@
+/* @formatter:off */
+.artifact_list {
+	text-align: left;
+	margin: 0 auto;
+
+  .artifact {
+	display: block;
+	padding: 4px;
+	margin-top: 3px;
+
+    .artifact_label {
+      font-weight: bold;
+    }
+  }
+
+  .update :hover {
+	cursor: pointer;
+  }
+
+}
+
+.no_results {
+  margin-bottom: 10px;
+}
+
+.search_form_container {
+	margin-bottom: 10px;
+}
+/* @formatter:on */

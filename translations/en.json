@@ -1,0 +1,80 @@
+{
+	"app": {
+		"package": "Rally",
+		"description": {
+			"value": "A Rally plugin to associate tickets to Rally artifacts",
+			"title": "App Description"
+		},
+		"name": {
+			"value": "Rally",
+			"title": "App Name"
+		},
+		"parameters": {
+			"api_url": {
+				"label": {
+					"value": "Rally Base URL",
+					"title": "Rally Base URL field for the app."
+				},
+				"helpText": {
+					"value": "The Rally URL is needed to make API calls to the correct service",
+					"title": "Text field below API URL explaining to the user where it will be used."
+				}
+			},
+			"api_token": {
+				"label": {
+					"value": "Rally API token",
+					"title": "Rally APi token field"
+				},
+				"helpText": {
+					"value": "The API token is what authenticates your Rally user account. To create it, base 64 encode your Rally username:password",
+					"title": "Text field below api_token explaining to the user where it will be used."
+				}
+			}
+		}
+	},
+
+	"label_search_term": {
+		"value": "Search Rally",
+		"title": "Label for search term text field"
+	},
+
+	"label_name": {
+		"value": "Name",
+		"title": "Label for artifact name"
+	},
+
+	"label_description": {
+		"value": "Description",
+		"title": "Label for artifact description"
+	},
+
+	"label_type": {
+		"value": "Type",
+		"title": "Label for artifact type"
+	},
+
+	"btn_search": {
+		"value": "Search",
+		"title": "Button label for search"
+	},
+
+	"btn_new_defect": {
+		"value": "New Defect ...",
+		"title": "Button label for new defect"
+	},
+
+	"btn_cancel": {
+		"value": "Cancel",
+		"title": "Button label for cancel"
+	},
+
+	"btn_go_back": {
+		"value": "Go Back",
+		"title": "Button label for Go Back"
+	},
+
+	"associate_artifact": {
+		"value": "[ASSOCIATE]",
+		"title": "Button label for Go Back"
+	}
+}

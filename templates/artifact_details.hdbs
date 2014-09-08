@@ -1,0 +1,5 @@
+<div class="artifact">
+	<div class="artifact_container">
+		<a href="{{_ref}}" target="_blank">{{FormattedID}}</a> : {{Name}}
+	</div>
+</div>

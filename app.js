@@ -124,17 +124,6 @@
 			this.$userForm = this.$('.form-horizontal').eq(0);
 			this.userFormData = this.$userForm.serializeArray();
 			_.each(this.userFormData, function (data) {
-				if (data.name === 'friends') {
-					data.value = _.map(data.value.split(';'), function (name) {
-						return name.trim();
-					});
-					data.value = _.filter(data.value, function (name) {
-						return name !== '';
-					});
-					if (data.value.length === 0) {
-						data.value = undefined;
-					}
-				}
 				if (data.name === 'married') {
 					data.value = !!data.value;
 				}

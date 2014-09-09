@@ -10,24 +10,44 @@
 			"title": "App Name"
 		},
 		"parameters": {
-			"api_url": {
+			"username": {
 				"label": {
-					"value": "Rally Base URL",
-					"title": "Rally Base URL field for the app."
+					"value": "Username",
+					"title": "Rally user name field."
 				},
 				"helpText": {
-					"value": "The Rally URL is needed to make API calls to the correct service",
-					"title": "Text field below API URL explaining to the user where it will be used."
+					"value": "The username for your Rally user account (ex: john@example.com)",
+					"title": "Text field below username explaining the field's use."
 				}
 			},
-			"api_token": {
+			"password": {
 				"label": {
-					"value": "Rally API token",
-					"title": "Rally APi token field"
+					"value": "Password",
+					"title": "Rally user password field"
 				},
 				"helpText": {
-					"value": "The API token is what authenticates your Rally user account. To create it, base 64 encode your Rally username:password",
-					"title": "Text field below api_token explaining to the user where it will be used."
+					"value": "The password for your Rally user account",
+					"title": "Text field below password explaining the field's use."
+				}
+			},
+			"workspace": {
+				"label": {
+					"value": "Workspace",
+					"title": "Rally Workspace field"
+				},
+				"helpText": {
+					"value": "The Rally workspace you want to connect search for stories and defects (Currently not utilized)",
+					"title": "Text field below workspace explaining the field's use."
+				}
+			},
+			"project": {
+				"label": {
+					"value": "Project",
+					"title": "Rally Project field"
+				},
+				"helpText": {
+					"value": "The Rally project you want to connect search for stories and defects (Currently not utilized)",
+					"title": "Text field below project explaining the field's use."
 				}
 			}
 		}

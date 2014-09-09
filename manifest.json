@@ -11,15 +11,27 @@
 	"frameworkVersion": "1.0",
 	"parameters": [
 		{
-			"name": "api_url",
+			"name": "username",
 			"type": "text",
 			"required": true
 		},
 
 		{
-			"name": "api_authentication_token",
-			"type": "text",
+			"name": "password",
+			"type": "password",
 			"required": true
+		},
+
+		{
+			"name": "workspace",
+			"type": "text",
+			"required": false
+		},
+
+		{
+			"name": "project",
+			"type": "text",
+			"required": false
 		}
 	]
 }

@@ -80,8 +80,10 @@
 		// @formatter:on
 
 		init: function () {
-			this.api_url = this.setting('api_url');
-			this.api_token = this.setting('api_token');
+			this.username = this.setting('username');
+			this.password = this.setting('password');
+			this.workspace = this.setting('workspace');
+			this.project = this.setting('project');
 
 			// Authorize with Rally and store it
 			this.ajax('fetchAuthorizationKey');
@@ -90,14 +92,19 @@
 		postInit: function (data) {
 			if (data.OperationResult.SecurityToken) {
 				this.store('rally.key', data.OperationResult.SecurityToken);
-				console.log(this.store('rally.key'));
+				console.log("Generated and stored this Rally security token: " + data.OperationResult.SecurityToken);
 			} else {
 				console.error(data);
 				services.notify("Could not authorize your credentials with Rally. Check your settings");
 			}
+
+			var apiField = this.ticket().customField("custom_field_22430739");
+			console.log("ticket's API link field: " + apiField);
 			// if the ticket has a link, display it
-			if (false) {
+			if (apiField || apiField === "") {
 				// show details page
+				services.notify('show the details page, but it is not created yet so you are going to the start anyway');
+				this.switchTo('start_page');
 			} else {
 				// no artifact, so search
 				this.switchTo('start_page');
@@ -135,7 +142,10 @@
 			// Need to determind what type of artifact
 			var artifactType = attributes[1] === "Defect" ? "defect" : "userstory";
 
-			// save URL to ticket
+			// save the webservices URL
+			ticket.customField("custom_field_22430739", attributes[1]);
+
+			// save details URL to ticket for users to view in Rally on web
 			var ticket = this.ticket();
 			ticket.customField("custom_field_22448315",
 							"https://rally1.rallydev.com/#/detail/" + artifactType + "/" + objectId);
@@ -148,16 +158,15 @@
 				updatedTicketCount = updatedTicketCount + 1;
 			}
 
+			// create expected object format
 			var data = {};
 			data.Defect = {};
 			data.Defect.c_NumberofTickets = updatedTicketCount;
-			console.log(JSON.stringify(data));
+			//console.log(JSON.stringify(data));
 
-			var mykey = this.store('rally.key');
-			console.log('my key ' + mykey);
 			// call out to Rally to update the ticket count
-
-			console.log(attributes[0] + "?key=" + mykey);
+			var mykey = this.store('rally.key');
+			console.log("Going to use this URL to POST an update: " + attributes[0] + "?key=" + mykey);
 			this.ajax('postAssociateWithTicket', attributes[0] + "?key=" + mykey, data);
 
 			this.switchTo('loading_screen');

@@ -53,6 +53,11 @@
 		"title": "Label for artifact type"
 	},
 
+	"label_associated_ticket_count": {
+		"value": "Associated Ticket Count",
+		"title": "Label for associated ticket count"
+	},
+
 	"btn_search": {
 		"value": "Search",
 		"title": "Button label for search"
@@ -75,6 +80,6 @@
 
 	"associate_artifact": {
 		"value": "[ASSOCIATE]",
-		"title": "Button label for Go Back"
+		"title": "link label for Associate Artifact"
 	}
 }

@@ -4,11 +4,13 @@
 		<ul class="artifact_list">
 			{{#artifacts}}
 			<li class="artifact">
-				<h5>{{t "label_name"}}:</h5><span class="name">{{Name}}</span>
-				<a class="associate_artifact" name="{{_ref}}">{{t "associate_artifact"}};{{c_NumberofTickets}}</a><br/>
-				<!-- <span class="artifact_label">{{t "label_type"}}:</span> <span class="age">{{_type}}</span> -->
-				<h5>{{t "label_description"}}:</h5><span class="age">{{Description}}</span><br/>
-				<span class="artifact_label">Number of Tickets:</span>
+				<h5>{{t "label_name"}}</h5><span class="name">{{Name}}</span>
+				<a class="associate_artifact" name="{{_ref}};{{_type}};{{c_NumberofTickets}}">
+					{{t "associate_artifact"}}</a><br/>
+				<!-- <span class="artifact_label">{{t "label_type"}}:</span> <span class="age">{{_type}}</span>
+				<h5>{{t "label_description"}}:</h5><span class="age">{{Description}}</span><br/> -->
+				<!--<span class="artifact_label">Number of Tickets:</span>-->
+				<h5>{{t "label_associated_ticket_count"}}</h5>
 				<span class="numberOfTickets">
 					{{#if c_NumberofTickets}}{{c_NumberofTickets}}{{else}}0{{/if}}
 				</span>

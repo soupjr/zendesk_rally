@@ -40,6 +40,26 @@
 					username: 'tcampbell@bidpalnetwork.com',
 					password: 'QjXYYbUFiu7iMD2Adq'
 				};
+			},
+
+			fetchAuthorizationKey: function () {
+				return {
+					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/security/authorize',
+					type: 'GET',
+					dataType: 'json',
+					username: 'tcampbell@bidpalnetwork.com',
+					password: 'QjXYYbUFiu7iMD2Adq'
+				};
+			},
+
+			postAssociateWithTicket: function (url, data) {
+				return {
+					url: url,
+					type: 'POST',
+					dataType: 'json',
+					contentType: 'application/json; charset=UTF-8',
+					data: JSON.stringify(data)
+				};
 			}
 		},
 		// @formatter:off
@@ -50,10 +70,12 @@
 			'click .back_to_start'              : 'renderStartPage',
 			'fetchNumberSearchResults.done'     : 'renderSearchResults',
 			'fetchTextSearchResults.done'       : 'renderSearchResults',
-			'postAssociateWithCase.done'        : 'renderAssociatedArtifact',
+			'postAssociateWithTicket.done'      : 'renderAssociatedArtifact',
+			'fetchAuthorizationKey.done'        : 'postInit',
 			'fetchNumberSearchResults.fail'     : 'fail',
 			'fetchTextSearchResults.fail'       : 'fail',
-			'postAssociateWithCase.fail'        : 'fail'
+			'postAssociateWithTicket.fail'      : 'fail',
+			'fetchAuthorizationKey.fail'        : 'fail'
 		},
 		// @formatter:on
 
@@ -61,12 +83,20 @@
 			this.api_url = this.setting('api_url');
 			this.api_token = this.setting('api_token');
 
-			// get current ticket's rally link
+			// Authorize with Rally and store it
+			this.ajax('fetchAuthorizationKey');
+		},
 
-			// if the link isn't blank, try to fetch the artifact
-
+		postInit: function (data) {
+			if (data.OperationResult.SecurityToken) {
+				this.store('rally.key', data.OperationResult.SecurityToken);
+				console.log(this.store('rally.key'));
+			} else {
+				console.error(data);
+				services.notify("Could not authorize your credentials with Rally. Check your settings");
+			}
+			// if the ticket has a link, display it
 			if (false) {
-				// if an artifact returns
 				// show details page
 			} else {
 				// no artifact, so search
@@ -75,7 +105,6 @@
 		},
 
 		searchForDefects: function (event) {
-			console.log(event);
 			event.preventDefault();
 			this.serializeFormData();
 			// perform an ajax call to search for defects.
@@ -88,7 +117,7 @@
 		},
 
 		renderSearchResults: function (data) {
-			//console.log(data.QueryResult.Results);
+			// console.log(data.QueryResult.Results);
 			// populate handlebars template with correct info
 			this.switchTo('artifact_list', {
 				artifacts: data.QueryResult.Results
@@ -96,21 +125,49 @@
 		},
 
 		associateArtifact: function (event) {
-			console.log(event);
+			var attributes = event.target.name.split(';');
+
+			console.log(attributes[0]);
+			// get the objectID from the _ref. As of 2.0 this is the only way I can get it
+			var webserviceRefURLParts = attributes[0].split("/");
+			var objectId = webserviceRefURLParts[webserviceRefURLParts.length - 1];
+
+			// Need to determind what type of artifact
+			var artifactType = attributes[1] === "Defect" ? "defect" : "userstory";
 
 			// save URL to ticket
 			var ticket = this.ticket();
-			//console.log('custom field: ' + ticket.customField("custom_field_22448315", 'troyistheman'));
-			ticket.customField("custom_field_22448315", 'troyistheman');
+			ticket.customField("custom_field_22448315",
+							"https://rally1.rallydev.com/#/detail/" + artifactType + "/" + objectId);
 
+			// update the associated ticket count
+			var updatedTicketCount = parseInt(attributes[2], 0);
+			if (isNaN(updatedTicketCount)) {
+				updatedTicketCount = 1;
+			} else {
+				updatedTicketCount = updatedTicketCount + 1;
+			}
+
+			var data = {};
+			data.Defect = {};
+			data.Defect.c_NumberofTickets = updatedTicketCount;
+			console.log(JSON.stringify(data));
+
+			var mykey = this.store('rally.key');
+			console.log('my key ' + mykey);
 			// call out to Rally to update the ticket count
-			//this.ajax('fetchArtifact');
 
-			//this.switchTo('loading_screen');
+			console.log(attributes[0] + "?key=" + mykey);
+			this.ajax('postAssociateWithTicket', attributes[0] + "?key=" + mykey, data);
+
+			this.switchTo('loading_screen');
 		},
 
-		renderAssociatedArtifact: function () {
+		renderAssociatedArtifact: function (data) {
+			console.log(data);
 			// display details about associated artifact
+			services.notify("Everything went okay.");
+			this.switchTo('start_page');
 		},
 
 		fail: function (data) {
@@ -124,9 +181,6 @@
 			this.$userForm = this.$('.form-horizontal').eq(0);
 			this.userFormData = this.$userForm.serializeArray();
 			_.each(this.userFormData, function (data) {
-				if (data.name === 'married') {
-					data.value = !!data.value;
-				}
 				if (data.value === '') {
 					data.value = undefined;
 				}

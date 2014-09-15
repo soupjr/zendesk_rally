@@ -10,6 +10,7 @@
 
 			fetchTextSearchResults: function (searchTerm) {
 				//console.log("search term " + searchTerm);
+
 				return {
 					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/artifact?query=((Name contains ' + searchTerm +
 							') OR (Description contains ' + searchTerm + '))&fetch=FormattedID,Name,Description,c_NumberofTickets',
@@ -64,47 +65,52 @@
 		},
 		// @formatter:off
 		events: {
-			'app.activated'                     : 'init',
+			'app.activated'                     : 'postInit',
 			'click .btn_search_rally_alm'       : 'searchForDefects',
 			'click .associate_artifact'         : 'associateArtifact',
 			'click .back_to_start'              : 'renderStartPage',
+			'click .btn_remove_artifact'        : 'removeAssociatedArtifact',
+			'click .btn_new_defect'             : 'renderNewDefectForm',
+			'click .btn_cancel_new_defect'      : 'postInit',
+			'click .btn_save_new_defect'        : 'postInit',
 			'fetchNumberSearchResults.done'     : 'renderSearchResults',
 			'fetchTextSearchResults.done'       : 'renderSearchResults',
-			'postAssociateWithTicket.done'      : 'renderAssociatedArtifact',
+			'postAssociateWithTicket.done'      : 'tempRenderAssociatedArtifact',
 			'fetchAuthorizationKey.done'        : 'postInit',
+			'fetchArtifact.done'                : 'renderAssociatedArtifact',
 			'fetchNumberSearchResults.fail'     : 'fail',
 			'fetchTextSearchResults.fail'       : 'fail',
 			'postAssociateWithTicket.fail'      : 'fail',
-			'fetchAuthorizationKey.fail'        : 'fail'
+			'fetchAuthorizationKey.fail'        : 'fail',
+			'fetchArtifact.fail'                : 'fail'
 		},
 		// @formatter:on
 
-		init: function () {
-			this.username = this.setting('username');
-			this.password = this.setting('password');
-			this.workspace = this.setting('workspace');
-			this.project = this.setting('project');
-
-			// Authorize with Rally and store it
-			this.ajax('fetchAuthorizationKey');
-		},
+//		init: function () {
+//			this.username = this.setting('username');
+//			this.password = this.setting('password');
+//			this.workspace = this.setting('workspace');
+//			this.project = this.setting('project');
+//
+//			// Authorize with Rally and store it
+//			this.ajax('fetchAuthorizationKey');
+//		},
 
 		postInit: function (data) {
-			if (data.OperationResult.SecurityToken) {
-				this.store('rally.key', data.OperationResult.SecurityToken);
-				console.log("Generated and stored this Rally security token: " + data.OperationResult.SecurityToken);
-			} else {
-				console.error(data);
-				services.notify("Could not authorize your credentials with Rally. Check your settings");
-			}
+//			if (data.OperationResult.SecurityToken) {
+//				this.store('rally.key', data.OperationResult.SecurityToken);
+//				console.log("Generated and stored this Rally security token: " + data.OperationResult.SecurityToken);
+//			} else {
+//				console.error(data);
+//				services.notify("Could not authorize your credentials with Rally. Check your settings");
+//			}
 
-			var apiField = this.ticket().customField("custom_field_22430739");
-			console.log("ticket's API link field: " + apiField);
+			var apiURL = this.ticket().customField("custom_field_22430739");
+
 			// if the ticket has a link, display it
-			if (apiField || apiField === "") {
+			if (apiURL || apiURL === "") {
 				// show details page
-				services.notify('show the details page, but it is not created yet so you are going to the start anyway');
-				this.switchTo('start_page');
+				this.ajax('fetchArtifact', apiURL);
 			} else {
 				// no artifact, so search
 				this.switchTo('start_page');
@@ -124,8 +130,7 @@
 		},
 
 		renderSearchResults: function (data) {
-			// console.log(data.QueryResult.Results);
-			// populate handlebars template with correct info
+			// populate template with correct info
 			this.switchTo('artifact_list', {
 				artifacts: data.QueryResult.Results
 			});
@@ -133,25 +138,13 @@
 
 		associateArtifact: function (event) {
 			var attributes = event.target.name.split(';');
-
-			console.log(attributes[0]);
-			// get the objectID from the _ref. As of 2.0 this is the only way I can get it
-			var webserviceRefURLParts = attributes[0].split("/");
-			var objectId = webserviceRefURLParts[webserviceRefURLParts.length - 1];
-
-			// Need to determind what type of artifact
-			var artifactType = attributes[1] === "Defect" ? "defect" : "userstory";
+			var ticket = this.ticket();
 
 			// save the webservices URL
-			ticket.customField("custom_field_22430739", attributes[1]);
-
-			// save details URL to ticket for users to view in Rally on web
-			var ticket = this.ticket();
-			ticket.customField("custom_field_22448315",
-							"https://rally1.rallydev.com/#/detail/" + artifactType + "/" + objectId);
+			ticket.customField("custom_field_22430739", attributes[0]);
 
 			// update the associated ticket count
-			var updatedTicketCount = parseInt(attributes[2], 0);
+			var updatedTicketCount = parseInt(attributes[1], 0);
 			if (isNaN(updatedTicketCount)) {
 				updatedTicketCount = 1;
 			} else {
@@ -162,10 +155,10 @@
 			var data = {};
 			data.Defect = {};
 			data.Defect.c_NumberofTickets = updatedTicketCount;
-			//console.log(JSON.stringify(data));
 
 			// call out to Rally to update the ticket count
-			var mykey = this.store('rally.key');
+			var mykey = '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM';
+			//var mykey = this.store('rally.key');
 			console.log("Going to use this URL to POST an update: " + attributes[0] + "?key=" + mykey);
 			this.ajax('postAssociateWithTicket', attributes[0] + "?key=" + mykey, data);
 
@@ -173,10 +166,34 @@
 		},
 
 		renderAssociatedArtifact: function (data) {
-			console.log(data);
+			var artifact = data.Defect;
+
+			// create user friendly link
+			var webserviceRefURLParts = artifact._ref.split('/');
+			var objectId = webserviceRefURLParts[webserviceRefURLParts.length - 1];
+			var artifactType = webserviceRefURLParts[webserviceRefURLParts.length - 2];
+
+			artifact.weblink = 'https://rally1.rallydev.com/#/detail/' + artifactType + '/' + objectId;
+
 			// display details about associated artifact
-			services.notify("Everything went okay.");
+			this.switchTo('artifact_details', {artifact: artifact});
+		},
+
+		removeAssociatedArtifact: function (event) {
+			// remove association from
+			this.ticket().customField("custom_field_22430739", null);
 			this.switchTo('start_page');
+		},
+
+		tempRenderAssociatedArtifact: function (data) {
+			// need to do something here.
+			console.log(data);
+			//show search page
+			this.switchTo('start_page');
+		},
+
+		renderNewDefectForm: function (event) {
+			this.switchTo('new_defect');
 		},
 
 		fail: function (data) {

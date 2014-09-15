@@ -1,0 +1,26 @@
+<div class="new_defect_page">
+	<div>
+		<h4 class="new_defect_header">{{t "new_defect_form"}}</h4>
+	</div>
+
+	<div>
+		<form class="form-horizontal">
+			<div class="control-group">
+				{{t "label_name"}}*<br/>
+
+				<input type="text" id="inputName" name="name" size="58" value="{{defect.Name}}">
+			</div>
+			<div class="control-group">
+				{{t "label_description"}}<br/>
+
+				<textarea cols="42" rows="10" id="inputDescription" name="description"
+						value="{{defect.Description}}"></textarea>
+			</div>
+		</form>
+	</div>
+
+	<div class="new_defect_footer">
+		<button class="btn btn_cancel_new_defect">{{t "btn_cancel"}}</button>
+		<button class="btn btn_save_new_defect">{{t "btn_save"}}</button>
+	</div>
+</div>

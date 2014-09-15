@@ -1,5 +1,10 @@
 <div class="artifact">
 	<div class="artifact_container">
-		<a href="{{_ref}}" target="_blank">{{FormattedID}}</a> : {{Name}}
+		<div class="artifact_details">
+			<a href="{{artifact.weblink}}" target="_blank">{{artifact.FormattedID}}</a> : {{artifact.Name}}
+		</div>
+	</div>
+	<div>
+		<button class="btn btn_remove_artifact">{{t "btn_remove_artifact"}}</button>
 	</div>
 </div>

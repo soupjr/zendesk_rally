@@ -78,6 +78,11 @@
 		"title": "Label for associated ticket count"
 	},
 
+	"new_defect_form": {
+		"value": "New Defect",
+		"title": "Label for new defect form"
+	},
+
 	"btn_search": {
 		"value": "Search",
 		"title": "Button label for search"
@@ -98,8 +103,23 @@
 		"title": "Button label for Go Back"
 	},
 
+	"btn_remove_artifact": {
+		"value": "Remove",
+		"title": "Button label for Remove Artifact"
+	},
+
 	"associate_artifact": {
 		"value": "[ASSOCIATE]",
 		"title": "link label for Associate Artifact"
+	},
+
+	"btn_close": {
+		"value": "Close",
+		"title": "Button label for close"
+	},
+
+	"btn_save": {
+		"value": "Save",
+		"title": "Button label for save"
 	}
 }

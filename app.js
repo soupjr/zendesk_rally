@@ -82,7 +82,6 @@
 			'fetchArtifact.fail'                : 'fail'
 		},
 		// @formatter:on
-
 		init: function () {
 			this.apikey = this.setting('apikey');
 			this.customfield = 'custom_field_' + this.setting('customfieldid');

@@ -1,0 +1,10 @@
+{
+	"ticket_fields": {
+		"rally_api_link": {
+			"type": "text",
+			"title": "Rally API Link",
+			"description": "This field holds the API URL to the associated Rally defect",
+			"collapsed_for_agents": true
+		}
+	}
+}

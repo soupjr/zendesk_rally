@@ -10,44 +10,14 @@
 			"title": "App Name"
 		},
 		"parameters": {
-			"username": {
+			"apikey": {
 				"label": {
-					"value": "Username",
-					"title": "Rally user name field."
+					"value": "API Key",
+					"title": "Rally API Key for user."
 				},
 				"helpText": {
-					"value": "The username for your Rally user account (ex: john@example.com)",
-					"title": "Text field below username explaining the field's use."
-				}
-			},
-			"password": {
-				"label": {
-					"value": "Password",
-					"title": "Rally user password field"
-				},
-				"helpText": {
-					"value": "The password for your Rally user account",
-					"title": "Text field below password explaining the field's use."
-				}
-			},
-			"workspace": {
-				"label": {
-					"value": "Workspace",
-					"title": "Rally Workspace field"
-				},
-				"helpText": {
-					"value": "The Rally workspace you want to connect search for stories and defects (Currently not utilized)",
-					"title": "Text field below workspace explaining the field's use."
-				}
-			},
-			"project": {
-				"label": {
-					"value": "Project",
-					"title": "Rally Project field"
-				},
-				"helpText": {
-					"value": "The Rally project you want to connect search for stories and defects (Currently not utilized)",
-					"title": "Text field below project explaining the field's use."
+					"value": "The API Key is a persistent, generated authentication key used to query and update Rally objects. Refer to Rally documentation on generating an API key.",
+					"title": "Text field below apikey explaining the field's use."
 				}
 			}
 		}

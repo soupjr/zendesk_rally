@@ -9,27 +9,22 @@
 		requests: {
 
 			fetchTextSearchResults: function (searchTerm) {
-				//console.log("search term " + searchTerm);
-
 				return {
 					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/artifact?query=((Name contains ' + searchTerm +
 							') OR (Description contains ' + searchTerm + '))&fetch=FormattedID,Name,Description,c_NumberofTickets',
 					type: 'GET',
 					dataType: 'json',
-					username: 'tcampbell@bidpalnetwork.com',
-					password: 'QjXYYbUFiu7iMD2Adq'
+					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
 				};
 			},
 
 			fetchNumberSearchResults: function (searchTerm) {
-				// console.log("search term " + searchTerm);
 				return {
 					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/artifact?query=((FormattedID = DE' + searchTerm +
 							') OR (FormattedID = US' + searchTerm + '))&fetch=FormattedId,Name,Description,c_NumberofTickets',
 					type: 'GET',
 					dataType: 'json',
-					username: 'tcampbell@bidpalnetwork.com',
-					password: 'QjXYYbUFiu7iMD2Adq'
+					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
 				};
 			},
 
@@ -38,24 +33,25 @@
 					url: url + '?fetch=FormattedID,Name,Description',
 					type: 'GET',
 					dataType: 'json',
-					username: 'tcampbell@bidpalnetwork.com',
-					password: 'QjXYYbUFiu7iMD2Adq'
-				};
-			},
-
-			fetchAuthorizationKey: function () {
-				return {
-					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/security/authorize',
-					type: 'GET',
-					dataType: 'json',
-					username: 'tcampbell@bidpalnetwork.com',
-					password: 'QjXYYbUFiu7iMD2Adq'
+					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
 				};
 			},
 
 			postAssociateWithTicket: function (url, data) {
 				return {
 					url: url,
+					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'},
+					type: 'POST',
+					dataType: 'json',
+					contentType: 'application/json; charset=UTF-8',
+					data: JSON.stringify(data)
+				};
+			},
+
+			postNewDefect: function (data) {
+				return {
+					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/defect/create',
+					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'},
 					type: 'POST',
 					dataType: 'json',
 					contentType: 'application/json; charset=UTF-8',
@@ -65,50 +61,39 @@
 		},
 		// @formatter:off
 		events: {
-			'app.activated'                     : 'postInit',
+			'app.activated'                     : 'init',
 			'click .btn_search_rally_alm'       : 'searchForDefects',
 			'click .associate_artifact'         : 'associateArtifact',
 			'click .back_to_start'              : 'renderStartPage',
 			'click .btn_remove_artifact'        : 'removeAssociatedArtifact',
 			'click .btn_new_defect'             : 'renderNewDefectForm',
 			'click .btn_cancel_new_defect'      : 'postInit',
-			'click .btn_save_new_defect'        : 'postInit',
+			'click .btn_save_new_defect'        : 'saveDefect',
 			'fetchNumberSearchResults.done'     : 'renderSearchResults',
 			'fetchTextSearchResults.done'       : 'renderSearchResults',
-			'postAssociateWithTicket.done'      : 'tempRenderAssociatedArtifact',
-			'fetchAuthorizationKey.done'        : 'postInit',
+			'postAssociateWithTicket.done'      : 'postInit',
+			'postNewDefect.done'                : 'addReferenceToTicket',
 			'fetchArtifact.done'                : 'renderAssociatedArtifact',
 			'fetchNumberSearchResults.fail'     : 'fail',
 			'fetchTextSearchResults.fail'       : 'fail',
 			'postAssociateWithTicket.fail'      : 'fail',
-			'fetchAuthorizationKey.fail'        : 'fail',
+			'postNewDefect.fail'                : 'fail',
 			'fetchArtifact.fail'                : 'fail'
 		},
 		// @formatter:on
 
-//		init: function () {
-//			this.username = this.setting('username');
-//			this.password = this.setting('password');
-//			this.workspace = this.setting('workspace');
-//			this.project = this.setting('project');
-//
-//			// Authorize with Rally and store it
-//			this.ajax('fetchAuthorizationKey');
-//		},
+		init: function () {
+
+			// this.apikey = this.setting('apikey');
+			this.apikey = '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM';
+			this.postInit(null);
+		},
 
 		postInit: function (data) {
-//			if (data.OperationResult.SecurityToken) {
-//				this.store('rally.key', data.OperationResult.SecurityToken);
-//				console.log("Generated and stored this Rally security token: " + data.OperationResult.SecurityToken);
-//			} else {
-//				console.error(data);
-//				services.notify("Could not authorize your credentials with Rally. Check your settings");
-//			}
-
-			var apiURL = this.ticket().customField("custom_field_22430739");
+			var apiURL = this.ticket().customField('custom_field_22430739');
 
 			// if the ticket has a link, display it
-			if (apiURL || apiURL === "") {
+			if (apiURL || apiURL === '') {
 				// show details page
 				this.ajax('fetchArtifact', apiURL);
 			} else {
@@ -141,7 +126,7 @@
 			var ticket = this.ticket();
 
 			// save the webservices URL
-			ticket.customField("custom_field_22430739", attributes[0]);
+			ticket.customField('custom_field_22430739', attributes[0]);
 
 			// update the associated ticket count
 			var updatedTicketCount = parseInt(attributes[1], 0);
@@ -152,21 +137,24 @@
 			}
 
 			// create expected object format
-			var data = {};
-			data.Defect = {};
+			var data = this.createDefectObject();
 			data.Defect.c_NumberofTickets = updatedTicketCount;
 
 			// call out to Rally to update the ticket count
-			var mykey = '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM';
-			//var mykey = this.store('rally.key');
-			console.log("Going to use this URL to POST an update: " + attributes[0] + "?key=" + mykey);
-			this.ajax('postAssociateWithTicket', attributes[0] + "?key=" + mykey, data);
+			this.ajax('postAssociateWithTicket', attributes[0], data);
 
 			this.switchTo('loading_screen');
 		},
 
 		renderAssociatedArtifact: function (data) {
-			var artifact = data.Defect;
+			var artifact;
+			if (data.Defect) {
+				artifact = data.Defect;
+			} else if (data.HierarchicalRequirement) {
+				artifact = data.HierarchicalRequirement;
+			} else {
+				services.notify('You cannot associate tasks to a ticket.');
+			}
 
 			// create user friendly link
 			var webserviceRefURLParts = artifact._ref.split('/');
@@ -181,19 +169,29 @@
 
 		removeAssociatedArtifact: function (event) {
 			// remove association from
-			this.ticket().customField("custom_field_22430739", null);
-			this.switchTo('start_page');
-		},
-
-		tempRenderAssociatedArtifact: function (data) {
-			// need to do something here.
-			console.log(data);
-			//show search page
+			this.ticket().customField('custom_field_22430739', null);
 			this.switchTo('start_page');
 		},
 
 		renderNewDefectForm: function (event) {
 			this.switchTo('new_defect');
+		},
+
+		saveDefect: function (event) {
+			//debugger;
+			this.serializeFormData();
+			var defect = this.createDefectObject();
+			defect.Defect = this.dataObjectArray;
+
+			this.ajax('postNewDefect', defect);
+			this.switchTo('loading_screen');
+		},
+
+		addReferenceToTicket: function (data) {
+			if (data.CreateResult.Object) {
+				this.ticket().customField('custom_field_22430739', data.CreateResult.Object._ref);
+			}
+			this.postInit(null);
 		},
 
 		fail: function (data) {
@@ -216,6 +214,13 @@
 
 		renderStartPage: function () {
 			this.switchTo('start_page');
+		},
+
+		createDefectObject: function () {
+			var data = {};
+			data.Defect = {};
+
+			return data;
 		}
 	};
 

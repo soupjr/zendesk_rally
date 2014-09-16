@@ -11,27 +11,9 @@
 	"frameworkVersion": "1.0",
 	"parameters": [
 		{
-			"name": "username",
+			"name": "apikey",
 			"type": "text",
 			"required": true
-		},
-
-		{
-			"name": "password",
-			"type": "password",
-			"required": true
-		},
-
-		{
-			"name": "workspace",
-			"type": "text",
-			"required": false
-		},
-
-		{
-			"name": "project",
-			"type": "text",
-			"required": false
 		}
 	]
 }

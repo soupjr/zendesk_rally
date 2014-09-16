@@ -8,12 +8,12 @@
 			<div class="control-group">
 				{{t "label_name"}}*<br/>
 
-				<input type="text" id="inputName" name="name" size="58" value="{{defect.Name}}">
+				<input type="text" id="inputName" name="Name" size="58" value="{{defect.Name}}">
 			</div>
 			<div class="control-group">
 				{{t "label_description"}}<br/>
 
-				<textarea cols="42" rows="10" id="inputDescription" name="description"
+				<textarea cols="42" rows="10" id="inputDescription" name="Description"
 						value="{{defect.Description}}"></textarea>
 			</div>
 		</form>

@@ -15,7 +15,7 @@
 			{{/artifacts}}
 		</ul>
 		{{else}}
-		<h5 class="no_results">No results found.</h5>
+		<h5 class="no_results">{{t "no_results"}}.</h5>
 		{{/if}}
 	</div>
 	<div class="user_page_control">

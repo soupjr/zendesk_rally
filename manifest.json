@@ -14,6 +14,12 @@
 			"name": "apikey",
 			"type": "text",
 			"required": true
+		},
+
+		{
+			"name": "customfieldid",
+			"type": "text",
+			"required": true
 		}
 	]
 }

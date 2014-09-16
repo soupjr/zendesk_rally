@@ -12,12 +12,23 @@
 		"parameters": {
 			"apikey": {
 				"label": {
-					"value": "API Key",
+					"value": "Rally API Key",
 					"title": "Rally API Key for user."
 				},
 				"helpText": {
 					"value": "The API Key is a persistent, generated authentication key used to query and update Rally objects. Refer to Rally documentation on generating an API key.",
 					"title": "Text field below apikey explaining the field's use."
+				}
+			},
+
+			"customfieldid": {
+				"label": {
+					"value": "Zendesk Custom Field ID",
+					"title": "The Zendesk Custom Field ID used in the application"
+				},
+				"helpText": {
+					"value": "The plugin requires custom text field to store a reference to the associated Rally defect. Have your Zendesk admin create one and provide you with this ID",
+					"title": "Text field below customfieldid explaining the field's use."
 				}
 			}
 		}
@@ -91,5 +102,25 @@
 	"btn_save": {
 		"value": "Save",
 		"title": "Button label for save"
+	},
+
+	"no_results": {
+		"value": "No results found.",
+		"title": "Description for No results found notification"
+	},
+
+	"save_successful": {
+		"value": "Saved!",
+		"title": "Description for save successful notification"
+	},
+
+	"remove_successful": {
+		"value": "Removed!",
+		"title": "Description for remove successful notification"
+	},
+
+	"cannot_associate": {
+		"value": "You cannot associate tasks to a ticket.",
+		"title": "Description for cannot associate notification"
 	}
 }

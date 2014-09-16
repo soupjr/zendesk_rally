@@ -4,7 +4,8 @@
 
 		defaultState: 'loading_screen',
 
-		resources: {},
+		resources: {
+		},
 
 		requests: {
 
@@ -59,7 +60,7 @@
 				};
 			}
 		},
-		// @formatter:off
+// @formatter:off
 		events: {
 			'app.activated'                     : 'init',
 			'click .btn_search_rally_alm'       : 'searchForArtifacts',
@@ -67,11 +68,11 @@
 			'click .back_to_start'              : 'renderSearchPage',
 			'click .btn_remove_artifact'        : 'removeAssociatedArtifact',
 			'click .btn_new_defect'             : 'renderNewDefectForm',
-			'click .btn_cancel_new_defect'      : 'postInit',
+			'click .btn_cancel_new_defect'      : 'renderDefaultPage',
 			'click .btn_save_new_defect'        : 'saveDefect',
 			'fetchNumberSearchResults.done'     : 'renderSearchResults',
 			'fetchTextSearchResults.done'       : 'renderSearchResults',
-			'postAssociateWithTicket.done'      : 'postInit',
+			'postAssociateWithTicket.done'      : 'afterAssociateArtifact',
 			'postNewDefect.done'                : 'addReferenceToTicket',
 			'fetchArtifact.done'                : 'renderAssociatedArtifact',
 			'fetchNumberSearchResults.fail'     : 'fail',
@@ -84,11 +85,13 @@
 
 		init: function () {
 			this.apikey = this.setting('apikey');
-			this.postInit(null);
+			this.customfield = 'custom_field_' + this.setting('customfieldid');
+			this.renderDefaultPage(null);
 		},
 
-		postInit: function (data) {
-			var apiURL = this.ticket().customField('custom_field_22430739');
+		renderDefaultPage: function (data) {
+
+			var apiURL = this.ticket().customField(this.customfield);
 
 			// if the ticket has a link, display it
 			if (apiURL || apiURL === '') {
@@ -124,17 +127,17 @@
 			var ticket = this.ticket();
 
 			// save the webservices URL
-			ticket.customField('custom_field_22430739', attributes[0]);
+			ticket.customField(this.customfield, attributes[0]);
 
 			// create expected object format
 			var data = this.createDefectObject();
 
 			// update the associated ticket count if necessary
 			var ticketCount = parseInt(attributes[1], 0);
-			if (!isNaN(updatedTicketCount)) {
-				data.Defect.c_NumberofTickets = ticketCount + 1;
-			} else {
+			if (isNaN(ticketCount)) {
 				data.Defect.c_NumberofTickets = 1;
+			} else {
+				data.Defect.c_NumberofTickets = ticketCount + 1;
 			}
 
 			// call out to Rally to update the ticket count
@@ -144,19 +147,21 @@
 		},
 
 		renderAssociatedArtifact: function (data) {
-			var artifact;
+			var artifact, artifactType;
 			if (data.Defect) {
 				artifact = data.Defect;
+				artifactType = 'defect';
 			} else if (data.HierarchicalRequirement) {
 				artifact = data.HierarchicalRequirement;
+				artifactType = 'userstory';
 			} else {
-				services.notify('You cannot associate tasks to a ticket.');
+				services.notify(this.I18n.t('cannot_associate'));
+				this.switchTo('search_page');
 			}
 
 			// create user friendly link
 			var webserviceRefURLParts = artifact._ref.split('/');
 			var objectId = webserviceRefURLParts[webserviceRefURLParts.length - 1];
-			var artifactType = webserviceRefURLParts[webserviceRefURLParts.length - 2];
 
 			artifact.weblink = 'https://rally1.rallydev.com/#/detail/' + artifactType + '/' + objectId;
 
@@ -166,34 +171,31 @@
 
 		removeAssociatedArtifact: function (event) {
 			// remove association from ticket
-			this.ticket().customField('custom_field_22430739', null);
+			this.ticket().customField(this.customfield, null);
 			this.switchTo('search_page');
-		},
-
-		renderNewDefectForm: function (event) {
-			this.switchTo('new_defect');
 		},
 
 		saveDefect: function (event) {
 			this.serializeFormData();
-			var defect = this.createDefectObject();
-			defect.Defect = this.dataObjectArray;
-			defect.Defect.c_NumberofTickets = 1;
+			var data = this.createDefectObject();
+			data.Defect = this.dataObjectArray;
+			data.Defect.c_NumberofTickets = 1;
 
-			this.ajax('postNewDefect', defect);
+			this.ajax('postNewDefect', data);
 			this.switchTo('loading_screen');
 		},
 
 		addReferenceToTicket: function (data) {
+			services.notify(this.I18n.t('save_successful'));
 			if (data.CreateResult.Object) {
-				this.ticket().customField('custom_field_22430739', data.CreateResult.Object._ref);
+				this.ticket().customField(this.customfield, data.CreateResult.Object._ref);
 			}
-			this.postInit(null);
+			this.renderDefaultPage(null);
 		},
 
-		fail: function (data) {
-			console.log(data);
-			services.notify(JSON.stringify(data));
+		afterAssociateArtifact: function (data) {
+			services.notify(this.I18n.t('save_successful'));
+			this.renderDefaultPage();
 		},
 
 		serializeFormData: function () {
@@ -208,15 +210,22 @@
 			}.bind(this));
 		},
 
-		renderSearchPage: function () {
-			this.switchTo('search_page');
-		},
-
 		createDefectObject: function () {
 			var data = {};
 			data.Defect = {};
 			return data;
+		},
+
+		renderNewDefectForm: function (event) {
+			this.switchTo('new_defect');
+		},
+
+		renderSearchPage: function () {
+			this.switchTo('search_page');
+		},
+
+		fail: function (data) {
+			services.notify(JSON.stringify(data));
 		}
 	};
-
 }());

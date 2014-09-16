@@ -62,7 +62,7 @@
 		// @formatter:off
 		events: {
 			'app.activated'                     : 'init',
-			'click .btn_search_rally_alm'       : 'searchForDefects',
+			'click .btn_search_rally_alm'       : 'searchForArtifacts',
 			'click .associate_artifact'         : 'associateArtifact',
 			'click .back_to_start'              : 'renderSearchPage',
 			'click .btn_remove_artifact'        : 'removeAssociatedArtifact',
@@ -100,7 +100,7 @@
 			}
 		},
 
-		searchForDefects: function (event) {
+		searchForArtifacts: function (event) {
 			event.preventDefault();
 			this.serializeFormData();
 			// perform an ajax call to search for defects.
@@ -165,7 +165,7 @@
 		},
 
 		removeAssociatedArtifact: function (event) {
-			// remove association from
+			// remove association from ticket
 			this.ticket().customField('custom_field_22430739', null);
 			this.switchTo('search_page');
 		},
@@ -196,7 +196,6 @@
 			services.notify(JSON.stringify(data));
 		},
 
-		/* Additional helpers - borrowed from Zendesk demo app (thanks!) */
 		serializeFormData: function () {
 			this.dataObjectArray = {};
 			this.$userForm = this.$('.form-horizontal').eq(0);

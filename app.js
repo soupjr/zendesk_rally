@@ -14,7 +14,7 @@
 							') OR (Description contains ' + searchTerm + '))&fetch=FormattedID,Name,Description,c_NumberofTickets',
 					type: 'GET',
 					dataType: 'json',
-					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
+					headers: {'zsessionid': this.apikey}
 				};
 			},
 
@@ -24,7 +24,7 @@
 							') OR (FormattedID = US' + searchTerm + '))&fetch=FormattedId,Name,Description,c_NumberofTickets',
 					type: 'GET',
 					dataType: 'json',
-					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
+					headers: {'zsessionid': this.apikey}
 				};
 			},
 
@@ -33,14 +33,14 @@
 					url: url + '?fetch=FormattedID,Name,Description',
 					type: 'GET',
 					dataType: 'json',
-					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'}
+					headers: {'zsessionid': this.apikey}
 				};
 			},
 
 			postAssociateWithTicket: function (url, data) {
 				return {
 					url: url,
-					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'},
+					headers: {'zsessionid': this.apikey},
 					type: 'POST',
 					dataType: 'json',
 					contentType: 'application/json; charset=UTF-8',
@@ -51,7 +51,7 @@
 			postNewDefect: function (data) {
 				return {
 					url: 'https://rally1.rallydev.com/slm/webservice/v2.0/defect/create',
-					headers: {'zsessionid': '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM'},
+					headers: {'zsessionid': this.apikey},
 					type: 'POST',
 					dataType: 'json',
 					contentType: 'application/json; charset=UTF-8',
@@ -64,7 +64,7 @@
 			'app.activated'                     : 'init',
 			'click .btn_search_rally_alm'       : 'searchForDefects',
 			'click .associate_artifact'         : 'associateArtifact',
-			'click .back_to_start'              : 'renderStartPage',
+			'click .back_to_start'              : 'renderSearchPage',
 			'click .btn_remove_artifact'        : 'removeAssociatedArtifact',
 			'click .btn_new_defect'             : 'renderNewDefectForm',
 			'click .btn_cancel_new_defect'      : 'postInit',
@@ -83,9 +83,7 @@
 		// @formatter:on
 
 		init: function () {
-
-			// this.apikey = this.setting('apikey');
-			this.apikey = '_LYHgRC3mSs6oiO8Uk9HheAFlbLDaC03InO4hMvydFM';
+			this.apikey = this.setting('apikey');
 			this.postInit(null);
 		},
 
@@ -98,7 +96,7 @@
 				this.ajax('fetchArtifact', apiURL);
 			} else {
 				// no artifact, so search
-				this.switchTo('start_page');
+				this.switchTo('search_page');
 			}
 		},
 
@@ -128,17 +126,16 @@
 			// save the webservices URL
 			ticket.customField('custom_field_22430739', attributes[0]);
 
-			// update the associated ticket count
-			var updatedTicketCount = parseInt(attributes[1], 0);
-			if (isNaN(updatedTicketCount)) {
-				updatedTicketCount = 1;
-			} else {
-				updatedTicketCount = updatedTicketCount + 1;
-			}
-
 			// create expected object format
 			var data = this.createDefectObject();
-			data.Defect.c_NumberofTickets = updatedTicketCount;
+
+			// update the associated ticket count if necessary
+			var ticketCount = parseInt(attributes[1], 0);
+			if (!isNaN(updatedTicketCount)) {
+				data.Defect.c_NumberofTickets = ticketCount + 1;
+			} else {
+				data.Defect.c_NumberofTickets = 1;
+			}
 
 			// call out to Rally to update the ticket count
 			this.ajax('postAssociateWithTicket', attributes[0], data);
@@ -170,7 +167,7 @@
 		removeAssociatedArtifact: function (event) {
 			// remove association from
 			this.ticket().customField('custom_field_22430739', null);
-			this.switchTo('start_page');
+			this.switchTo('search_page');
 		},
 
 		renderNewDefectForm: function (event) {
@@ -178,10 +175,10 @@
 		},
 
 		saveDefect: function (event) {
-			//debugger;
 			this.serializeFormData();
 			var defect = this.createDefectObject();
 			defect.Defect = this.dataObjectArray;
+			defect.Defect.c_NumberofTickets = 1;
 
 			this.ajax('postNewDefect', defect);
 			this.switchTo('loading_screen');
@@ -212,14 +209,13 @@
 			}.bind(this));
 		},
 
-		renderStartPage: function () {
-			this.switchTo('start_page');
+		renderSearchPage: function () {
+			this.switchTo('search_page');
 		},
 
 		createDefectObject: function () {
 			var data = {};
 			data.Defect = {};
-
 			return data;
 		}
 	};

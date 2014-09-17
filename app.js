@@ -84,7 +84,9 @@
 		// @formatter:on
 		init: function () {
 			this.apikey = this.setting('apikey');
-			this.customfield = 'custom_field_' + this.setting('customfieldid');
+			var tmp = this.setting('customfieldid');
+			this.customfield = 'custom_field_' + tmp;
+
 			this.renderDefaultPage(null);
 		},
 
